@@ -1,8 +1,8 @@
 # scoords
 
-The ``scoords`` library defined an ``astropy`` custom coordinate frame. This allows to specify coordinates relative to the local spacecraft coordinates and transform them to any other system using ``astropy``'s machinery.
+The ``scoords`` library defines an ``astropy`` custom coordinate frame. This allows to specify coordinates relative to the local spacecraft coordinates and transform them to any other system using ``astropy``'s machinery.
 
-``SkyCoord`` objects are instantiated by passing a location with specified units and a coordinate frame. Use ``SpacecraftFrame`` to specify a coordinate is the coordinate system attached to the spacecraft:
+``SkyCoord`` objects are instantiated by passing a location with specified units and a coordinate frame. Use ``SpacecraftFrame`` to specify a coordinate in the reference system attached to the spacecraft:
 
 
 ```python
@@ -28,7 +28,7 @@ c.frame
 
 
 
-However, in order to transform it into other coordinates system you need to specify the orientation of the spacecraft with respect to the ICRS or other reference frame --i.e. you need to specify the attitude
+However, in order to transform it into other coordinate system you need to specify the orientation of the spacecraft with respect to an inertial reference frame --i.e. the attitude
 
 
 ```python
@@ -39,14 +39,14 @@ attitude = Attitude.from_rotvec(45*u.deg*[0,0,1], frame = 'icrs')
 c = SkyCoord(lon = 0*u.deg, lat = 0*u.deg, frame = SpacecraftFrame(attitude = attitude))
 ```
 
-The following formats are supported to specify the orientation:
-- A rotation matrix
+There are class methods to specify the orientation in any of the following formats:
+- A rotation matrx
 - A vector co-directional to the axis of rotation
 - A quaternion
 - A `scipy`'s `Rotation` object
 - The direction the spacecraft coordinates axes point to
 
-Once the attitude, we can transform from/to any other frame supported by astropy
+Once the attitude is specified, we can transform from/to any other frame supported by astropy
 
 
 ```python
@@ -111,8 +111,3 @@ c.frame.location.geodetic
     GeodeticLocation(lon=<Longitude 10. deg>, lat=<Latitude 46. deg>, height=<Quantity 400. km>)
 
 
-
-
-```python
-
-```
