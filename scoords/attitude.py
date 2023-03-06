@@ -289,7 +289,7 @@ class Attitude:
         return np.asarray(self.rot).shape
 
     def __getitem__(self, key):
-        return self.rot[key]
+        return self.__class__(self.rot[key], frame = self.frame)
 
     def __setitem__(self, key, value):
         self.rot[key] = value.transform_to(self.frame)._rot
