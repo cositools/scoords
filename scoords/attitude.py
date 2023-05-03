@@ -159,7 +159,7 @@ class Attitude:
             raise ValueError("At least two axes are needed.")
 
         if x is None:
-            x = y.cross(x)
+            x = y.cross(z)
         elif y is None:
             y = z.cross(x)
         elif z is None:
