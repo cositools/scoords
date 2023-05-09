@@ -32,6 +32,14 @@ class Attitude:
         else:
             self._frame = frame
 
+
+    def copy(self, *args, **kwargs):
+
+        new = self.__class__(deepcopy(self.rot),
+                             frame = deepcopy(self.frame))
+
+        return new
+            
     @property
     def rot(self):
         """
