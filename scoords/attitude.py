@@ -296,6 +296,9 @@ class Attitude:
         """
         return np.asarray(self.rot).shape
 
+    def __len__(self):
+        return len(self.rot)
+    
     def __getitem__(self, key):
         return self.__class__(self.rot[key], frame = self.frame)
 
