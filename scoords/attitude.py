@@ -294,7 +294,7 @@ class Attitude:
         -------
         array
         """
-        return np.asarray(self.rot).shape
+        return self.rot.as_quat().shape[:-1]
 
     def __len__(self):
         return len(self.rot)
