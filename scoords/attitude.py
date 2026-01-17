@@ -22,9 +22,9 @@ class Attitude:
     frame : :py:class:`astropy.coordinates.BaseCoordinateFrame`
         Inertial reference frame
     """
-    
+
     def __init__(self, rot, frame = None):
-        
+
         self._rot = rot
 
         if frame is None:
@@ -39,7 +39,7 @@ class Attitude:
                              frame = deepcopy(self.frame))
 
         return new
-            
+
     @property
     def rot(self):
         """
@@ -49,9 +49,9 @@ class Attitude:
         -------
         :py:class:`scipy.spatial.transform.Rotation`
         """
-        
+
         return self._rot
-            
+
     @property
     def frame(self):
         """
@@ -61,9 +61,9 @@ class Attitude:
         -------
         :py:class:`astropy.coordinates.BaseCoordinateFrame`
         """
-        
+
         return self._frame
-    
+
     @classmethod
     def from_quat(cls, quat, frame = None):
         """
@@ -81,7 +81,7 @@ class Attitude:
         -------
         :py:class:`Attitude`
         """
-        
+
         return cls(Rotation.from_quat(quat), frame)
 
     @classmethod
@@ -102,7 +102,7 @@ class Attitude:
         """
 
         return cls(Rotation.from_matrix(matrix), frame)
-        
+
     @classmethod
     def from_rotvec(cls, rotvec, frame = None):
         """
@@ -128,10 +128,10 @@ class Attitude:
     def from_axes(cls, x = None, y = None, z = None, frame = None):
         """
         Construct rotation based on the sky coordinates the :py:class:`.SpacecraftFrame`
-        axes point to. 
+        axes point to.
 
         Specify at least 2 axes. The third axes is implicit based on the right-hand rule.
-        
+
         Parameters
         ----------
         x : :py:class:`astropy.coordinates.SkyCoord`, optional
@@ -154,14 +154,14 @@ class Attitude:
         # Make sure all inputs are in the same frame
         if frame is None:
             frame = 'icrs'
-        
+
         if x is not None:
             x = x.transform_to(frame).represent_as('cartesian')
         if y is not None:
             y = y.transform_to(frame).represent_as('cartesian')
         if z is not None:
             z = z.transform_to(frame).represent_as('cartesian')
-            
+
         # Get the missing axis if needed
         if len([i for i in [x,y,z] if i is None]) > 1:
             raise ValueError("At least two axes are needed.")
@@ -191,10 +191,10 @@ class Attitude:
             Inertial reference frame
 
         Returns
-        -------        
+        -------
         :py:class:`Attitude`
         """
-        
+
         return cls(Rotation.identity(), frame = frame)
 
     def inv(self):
@@ -202,12 +202,12 @@ class Attitude:
         Inverse transformation.
 
         Returns
-        -------        
+        -------
         :py:class:`Attitude`
         """
-        
+
         return Attitude(self.rot.inv(), frame = self.frame)
-    
+
     def transform_to(self, frame):
         """
         Return the attitude with respect to different inertial reference frame.
@@ -218,17 +218,17 @@ class Attitude:
             Inertial reference frame
 
         Returns
-        -------        
-        :py:class:`Attitude`        
+        -------
+        :py:class:`Attitude`
         """
-        
+
         if self.frame == frame:
             return deepcopy(self)
 
         axes = self.as_axes()
 
         return self.from_axes(*axes, frame = frame)
-        
+
     def as_matrix(self):
         """
         Represent as rotation matrix.
@@ -237,7 +237,7 @@ class Attitude:
         -------
             array, shape (3, 3) or (N, 3, 3)
         """
-        
+
         return self.rot.as_matrix()
 
     def as_rotvec(self):
@@ -246,7 +246,7 @@ class Attitude:
 
         Returns
         -------
-            :py:class:`astropy.units.Quantity`, shape (3,) or (N, 3)        
+            :py:class:`astropy.units.Quantity`, shape (3,) or (N, 3)
         """
         return self.rot.as_rotvec()*u.rad
 
@@ -256,9 +256,9 @@ class Attitude:
 
         Returns
         -------
-            array, shape (4,) or (N, 4)        
+            array, shape (4,) or (N, 4)
         """
-        
+
         return self.rot.as_quat()
 
     def as_axes(self):
@@ -278,13 +278,13 @@ class Attitude:
             Coordinate in the inertial reference frame that the spacecraft reference frame
             z-axis is pointing to.
         """
-        
+
         matrix = np.transpose(self.as_matrix())
-        
+
         return (SkyCoord(CartesianRepresentation(*matrix[0]), frame = self.frame),
                 SkyCoord(CartesianRepresentation(*matrix[1]), frame = self.frame),
                 SkyCoord(CartesianRepresentation(*matrix[2]), frame = self.frame))
-    
+
     @property
     def shape(self):
         """
@@ -294,11 +294,11 @@ class Attitude:
         -------
         array
         """
-        return self.rot.as_quat().shape[:-1]
+        return () if self.rot.single else (len(self.rot),)
 
     def __len__(self):
         return len(self.rot)
-    
+
     def __getitem__(self, key):
         return self.__class__(self.rot[key], frame = self.frame)
 
@@ -308,20 +308,20 @@ class Attitude:
     def __str__(self):
         return f"<quat = {self.rot.as_quat()}, frame = {self.frame}>"
 
-    
+
 class AttitudeAttribute(Attribute):
     """
     Interface for attitude with astropy's custom :py:class:`.SpacecraftFrame`
     """
-    
+
     def convert_input(self, value):
 
         if value is None:
             return None, False
-        
+
         if not isinstance(value, Attitude):
             raise ValueError("Attitude is not an instance of Attitude.")
-            
+
         converted = True
-                        
+
         return value,converted
